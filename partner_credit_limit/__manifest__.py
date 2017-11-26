@@ -3,7 +3,7 @@
 
 {
     'name': 'Partner Credit Limit',
-    'version': '10.0.2.0.0',
+    'version': '10.0.2.1.0',
     'category': 'Partner',
     'depends': ['account', 'sale'],
     'license': 'AGPL-3',
@@ -18,6 +18,7 @@
     'website': 'http://www.serpentcs.com',
     'data': [
         'views/partner_view.xml',
+        'views/sale_order_views.xml',
     ],
     'installable': True,
     'auto_install': False,
