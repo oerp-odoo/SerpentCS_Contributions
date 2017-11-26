@@ -2,7 +2,7 @@
 # Copyright 2016 Serpent Consulting Services Pvt. Ltd.
 # See LICENSE file for full copyright and licensing details.
 
-from odoo import api, models, _
+from odoo import fields, models, api, _
 from datetime import datetime
 from odoo.tools import DEFAULT_SERVER_DATE_FORMAT as DF
 from odoo.exceptions import UserError
@@ -10,6 +10,8 @@ from odoo.exceptions import UserError
 
 class SaleOrder(models.Model):
     _inherit = "sale.order"
+
+    over_credit = fields.Boolean("Allow Over Credit?")
 
     @api.multi
     def check_limit(self):
@@ -31,7 +33,7 @@ class SaleOrder(models.Model):
                 debit += line.credit
 
         if (credit - debit + self.amount_total) > partner.credit_limit:
-            if not partner.over_credit:
+            if not partner.over_credit and not self.over_credit:
                 msg = 'Can not confirm Sale Order,Total mature due Amount ' \
                       '%s as on %s !\nCheck Partner Accounts or Credit ' \
                       'Limits !' % (credit - debit, today_dt)
