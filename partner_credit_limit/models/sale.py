@@ -14,7 +14,7 @@ class SaleOrder(models.Model):
     over_credit = fields.Boolean("Allow Over Credit?")
 
     @api.multi
-    def check_limit(self):
+    def check_limit(self, no_raise=False):
         """Check if credit limit for partner was exceeded."""
         self.ensure_one()
         partner = self.partner_id
@@ -37,10 +37,15 @@ class SaleOrder(models.Model):
                 msg = 'Can not confirm Sale Order,Total mature due Amount ' \
                       '%s as on %s !\nCheck Partner Accounts or Credit ' \
                       'Limits !' % (credit - debit, today_dt)
+                if no_raise:
+                    return False
                 raise UserError(_('Credit Over Limits !\n' + msg))
             else:
-                partner.write({
-                    'credit_limit': credit - debit + self.amount_total})
+                # Do not adjust partner credit limit when just checking
+                # before actually confirming sale order.
+                if not no_raise:
+                    partner.write({
+                        'credit_limit': credit - debit + self.amount_total})
                 return True
         else:
             return True
